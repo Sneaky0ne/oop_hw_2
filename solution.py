@@ -4,6 +4,7 @@ from typing import List, Optional
 import copy
 
 
+
 class Printable(ABC):
     """Base abstract class for printable objects."""
 
@@ -17,6 +18,15 @@ class Printable(ABC):
         """Create a deep copy of this object."""
         pass
 
+def print_child(os, printable_items: list[Printable], is_last_on_index, prefix: str):
+    for index, printable in enumerate(printable_items):
+        printable.print_me(
+            os,
+            prefix=prefix,
+            is_last= index == is_last_on_index,
+            no_slash=False,
+            is_root=False
+        )
 
 class BasicCollection(Printable):
     """Base class for collections of items."""
@@ -88,43 +98,16 @@ class Computer(BasicCollection, Component):
         self.components.append(comp)
         return self
 
+
     def print_me(self, os, prefix="", is_last=False, no_slash=False, is_root=False):
         if not is_last:
             os.write(f"\n+-Host: {self.name}")
-            for index, addresses in enumerate(self.addresses):
-                addresses.print_me(
-                    os,
-                    prefix="| ",
-                    is_last=(index == len(self.components) + len(self.addresses) - 1),
-                    no_slash=False,
-                    is_root=False
-                )
-            for index, components in enumerate(self.components):
-                components.print_me(
-                    os,
-                    prefix="| ",
-                    is_last=(index == len(self.components) - 1),
-                    no_slash=False,
-                    is_root=False
-                )
+            print_child(os, self.addresses, len(self.components) + len(self.addresses) - 1, "| ")
+            print_child(os, self.components, len(self.components) - 1, "| ")
         else:
             os.write(f"\n\-Host: {self.name}")
-            for index, addresses in enumerate(self.addresses):
-                addresses.print_me(
-                    os,
-                    prefix="  ",
-                    is_last=(index == len(self.addresses) + len(self.addresses) - 1),
-                    no_slash=True,
-                    is_root=False
-                )
-            for index, components in enumerate(self.components):
-                components.print_me(
-                    os,
-                    prefix="  ",
-                    is_last=(index == len(self.components) - 1),
-                    no_slash=False,
-                    is_root=False
-                )
+            print_child(os, self.addresses, len(self.components) + len(self.addresses) - 1, "  ")
+            print_child(os, self.components, len(self.components) - 1, "  ")
 
     # Другие методы...
 
@@ -155,17 +138,9 @@ class Network(Printable):
 
     def print_me(self, os, prefix="", is_last=False, no_slash=False, is_root=False):
         os.write(f"Network: {self.name}")
-        for index, comp in enumerate(self.computers):
-            comp.print_me(
-                os,
-                prefix="+",
-                is_last=(index == len(self.computers) - 1),
-                no_slash=False,
-                is_root=False
-            )
+        print_child(os, self.computers, len(self.computers) - 1, "  ")
 
     def clone(self):
-        import copy
         return copy.deepcopy(self)
     # Другие методы...
 
