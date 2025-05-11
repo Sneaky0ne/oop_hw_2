@@ -75,6 +75,9 @@ class Computer(BasicCollection, Component):
         BasicCollection.__init__(self, )
         Component.__init__(self)
 
+    def __str__(self):
+        return self.name
+
     def add_address(self, addr: str):
         # To be implemented
         self.addresses.append(Address(addr))
@@ -145,6 +148,9 @@ class Network(Printable):
 
     def find_computer(self, name):
         # To be implemented
+        for comp in self.computers:
+            if comp.name == name:
+                return comp
         return None
 
     def print_me(self, os, prefix="", is_last=False, no_slash=False, is_root=False):
@@ -176,6 +182,9 @@ class Disk(Component):
         self.storage_type = "SSD" if storage_type == self.SSD else "HDD"
         self.size = size
         super().__init__()
+
+    def __str__(self):
+        return self.storage_type
 
     def add_partition(self, size, name):
         # To be implemented
